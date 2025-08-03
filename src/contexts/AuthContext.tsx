@@ -2,8 +2,9 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 
-// Complete the auth session for web
+// Configure WebBrowser for better OAuth experience
 WebBrowser.maybeCompleteAuthSession();
 
 interface User {
@@ -51,13 +52,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Check if client ID is properly configured
   const isClientIdConfigured = clientId !== 'your-google-client-id';
 
+  // Use Expo's default redirect URI which handles COOP correctly
+  const redirectUri = AuthSession.makeRedirectUri({
+    preferLocalhost: true, // This helps with COOP issues
+  });
+
+  console.log('Using redirect URI:', redirectUri); // Debug log
+  console.log('Client ID:', clientId); // Debug log
+
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
       clientId,
       scopes: ['openid', 'profile', 'email'],
-      redirectUri: AuthSession.makeRedirectUri({
-        scheme: 'ingredient-analyzer',
-      }),
+      redirectUri,
+      responseType: AuthSession.ResponseType.Token, // Use implicit flow to avoid client secret requirement
+      usePKCE: false, // Explicitly disable PKCE for implicit flow
+      extraParams: {
+        // Ensure we're using the right flow
+        'prompt': 'select_account',
+      },
     },
     discovery
   );
@@ -70,12 +83,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Handle auth response
   useEffect(() => {
     if (response?.type === 'success') {
-      const { authentication } = response;
-      if (authentication?.accessToken) {
-        fetchUserInfo(authentication.accessToken);
+      if (response.params.access_token) {
+        // Direct access token from implicit flow
+        fetchUserInfo(response.params.access_token);
+      } else {
+        console.error('No access token in response:', response.params);
+        alert('Authentication failed: No access token received');
+        setIsLoading(false);
       }
     } else if (response?.type === 'error') {
       console.error('Auth error:', response.error);
+      alert(`Authentication failed: ${response.error?.message || 'Unknown error'}`);
+      setIsLoading(false);
+    } else if (response?.type === 'cancel') {
+      console.log('User cancelled authentication');
       setIsLoading(false);
     }
   }, [response]);
@@ -128,10 +149,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Check if Google Client ID is configured
       if (!isClientIdConfigured) {
         alert('Google OAuth is not configured. Please follow the setup instructions in GOOGLE_OAUTH_QUICK_SETUP.md');
+        setIsLoading(false);
         return;
       }
+
+      console.log('Starting OAuth flow with redirect URI:', redirectUri);
+      const result = await promptAsync();
+      console.log('OAuth result:', result);
       
-      await promptAsync();
+      // The response will be handled by the useEffect above
     } catch (error) {
       console.error('Sign in error:', error);
       alert('Sign in failed. Please check your Google OAuth configuration.');
@@ -140,14 +166,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const signOut = async () => {
+    console.log('🔓 signOut function called'); // Debug log
     try {
+      console.log('Starting sign out process...');
       setIsLoading(true);
+      
+      // Clear user state first
+      console.log('Clearing user state...');
       setUser(null);
+      
+      // Clear stored data
+      console.log('Clearing AsyncStorage...');
       await AsyncStorage.multiRemove(['user', 'accessToken']);
+      console.log('User data cleared successfully');
+      
     } catch (error) {
       console.error('Sign out error:', error);
+      // Even if there's an error clearing storage, we should still sign out the user
+      setUser(null);
     } finally {
       setIsLoading(false);
+      console.log('Sign out completed');
     }
   };
 
