@@ -52,7 +52,7 @@
       ]
     ],
     "extra": {
-      "GEMINI_API_KEY": "AIzaSyAZlUg-nyHMQCSBDmnEQz7Tb--HN9vP500"
+      "GEMINI_API_KEY": null
     },
     "scheme": "ingredient-analyzer"
   }
