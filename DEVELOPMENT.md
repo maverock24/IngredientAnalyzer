@@ -11,10 +11,11 @@ For quick local testing with direct API calls:
 1. **Get your Gemini API key** from [Google AI Studio](https://aistudio.google.com/app/apikey)
 
 2. **Configure for local development**:
+
    ```typescript
    // In src/config/index.ts
    export const config = {
-     GEMINI_API_KEY_LOCAL: 'your-api-key-here', // Add your key
+     GEMINI_API_KEY_LOCAL: "your-api-key-here", // Add your key
      USE_LOCAL_API: true, // Enable local API mode
      USE_MOCK_DATA: false,
      // ... other settings
@@ -22,6 +23,7 @@ For quick local testing with direct API calls:
    ```
 
 3. **Run the app**:
+
    ```bash
    npm run web
    ```
@@ -37,22 +39,26 @@ For quick local testing with direct API calls:
 For testing with Netlify Functions locally:
 
 1. **Install Netlify CLI**:
+
    ```bash
    npm install -g netlify-cli
    ```
 
 2. **Set up environment**:
+
    ```bash
    # Create .env file with your API key
    echo "GEMINI_API_KEY=your-api-key-here" > .env
    ```
 
 3. **Run with Netlify Dev**:
+
    ```bash
    npm run dev:netlify
    ```
-   
+
    This will:
+
    - Start your Expo app
    - Run Netlify Functions locally at `localhost:8888`
    - Your app will use local functions instead of direct API calls
@@ -62,6 +68,7 @@ For testing with Netlify Functions locally:
 For testing without an API key:
 
 1. **Enable mock mode**:
+
    ```typescript
    // In src/config/index.ts
    export const config = {
@@ -80,6 +87,7 @@ For testing without an API key:
 For production, the app automatically uses Netlify Functions:
 
 1. **Set API key in Netlify Dashboard**:
+
    - Go to Site settings > Environment variables
    - Add `GEMINI_API_KEY` with your API key
 
@@ -92,9 +100,9 @@ The app will automatically use server-side functions for secure API calls.
 
 ## Configuration Summary
 
-| Mode | USE_LOCAL_API | USE_MOCK_DATA | API Key Location | Use Case |
-|------|---------------|---------------|------------------|----------|
-| Local API | `true` | `false` | `GEMINI_API_KEY_LOCAL` | Quick local testing |
-| Netlify Dev | `false` | `false` | `.env` file | Full local testing |
-| Mock Data | `false` | `true` | Not needed | Testing without API |
-| Production | `false` | `false` | Netlify Dashboard | Live deployment |
+| Mode        | USE_LOCAL_API | USE_MOCK_DATA | API Key Location       | Use Case            |
+| ----------- | ------------- | ------------- | ---------------------- | ------------------- |
+| Local API   | `true`        | `false`       | `GEMINI_API_KEY_LOCAL` | Quick local testing |
+| Netlify Dev | `false`       | `false`       | `.env` file            | Full local testing  |
+| Mock Data   | `false`       | `true`        | Not needed             | Testing without API |
+| Production  | `false`       | `false`       | Netlify Dashboard      | Live deployment     |

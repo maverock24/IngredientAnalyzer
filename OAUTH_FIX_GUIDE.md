@@ -1,7 +1,9 @@
 # 🚨 Fix for "OAuth client was not found" Error
 
 ## The Problem
+
 Your app is trying to use Google OAuth but the Client ID is not configured properly. This is why you're seeing:
+
 ```
 Access blocked: authorisation error
 The OAuth client was not found.
@@ -15,11 +17,13 @@ The OAuth client was not found.
 
 1. **Create or select a project**
 2. **Enable required APIs**:
+
    - Go to "APIs & Services" > "Library"
    - Search for and enable: "Google+ API"
    - Also enable: "Google Identity Services API"
 
 3. **Create OAuth 2.0 Client ID**:
+
    - Go to "APIs & Services" > "Credentials"
    - Click "Create Credentials" > "OAuth 2.0 Client IDs"
    - Choose "Web application"
@@ -46,6 +50,7 @@ The OAuth client was not found.
 ### 3. Test the Fix
 
 1. **Restart your development server**:
+
    ```bash
    npm run web
    ```
@@ -63,6 +68,7 @@ The OAuth client was not found.
 ## Still Need Help?
 
 If you're still having issues:
+
 1. Double-check your Client ID has no extra spaces
 2. Make sure both APIs are enabled in Google Cloud Console
 3. Verify the redirect URIs are exactly: `http://localhost:8081` and `http://localhost:19006`

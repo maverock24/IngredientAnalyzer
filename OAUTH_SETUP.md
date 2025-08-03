@@ -18,11 +18,13 @@ This guide will help you set up Google OAuth authentication for the Ingredient A
    - For **Android**: Select "Android"
 
 ### For Web Applications:
+
 - **Authorized redirect URIs**: Add your web domain
 - For local development: `http://localhost:8081`
 - For production: `https://your-netlify-domain.netlify.app`
 
 ### For Mobile Applications:
+
 - **Bundle ID** (iOS): `com.yourcompany.ingredient-analyzer`
 - **Package name** (Android): `com.yourcompany.ingredient_analyzer`
 
@@ -33,7 +35,7 @@ This guide will help you set up Google OAuth authentication for the Ingredient A
 3. Replace `'your-google-client-id'` with your actual Client ID:
 
 ```typescript
-const clientId = 'your-actual-google-client-id.apps.googleusercontent.com';
+const clientId = "your-actual-google-client-id.apps.googleusercontent.com";
 ```
 
 ## Step 4: Update Environment Variables
@@ -49,12 +51,14 @@ For production deployment, add your client ID to Netlify environment variables:
 Then update the AuthContext to use the environment variable:
 
 ```typescript
-const clientId = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID || 'your-fallback-client-id';
+const clientId =
+  process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID || "your-fallback-client-id";
 ```
 
 ## Step 5: Test the Authentication
 
 1. Run your app in development:
+
    ```bash
    npm run web
    ```
@@ -67,10 +71,12 @@ const clientId = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID || 'your-fallback-clie
 ### Common Issues:
 
 1. **"OAuth client not found"**
+
    - Make sure your Client ID is correct
    - Verify the redirect URI matches your configuration
 
 2. **"This app isn't verified"**
+
    - This is normal for development
    - You can proceed by clicking "Advanced" > "Go to [app] (unsafe)"
 

@@ -1,8 +1,10 @@
 # 🔧 Fix for OAuth Issues - UPDATED
 
 ## The Problem
+
 You were getting:
-1. "Cross-Origin-Opener-Policy policy would block the window.close call" 
+
+1. "Cross-Origin-Opener-Policy policy would block the window.close call"
 2. "client_secret is missing" error
 3. Loading icon stays on screen
 
@@ -15,7 +17,7 @@ I've updated the code to use the **implicit OAuth flow** which doesn't require a
 From your console log, I can see your app is using: **`http://localhost:8081`**
 
 1. **Go to**: https://console.cloud.google.com/
-2. **Navigate to**: APIs & Services → Credentials  
+2. **Navigate to**: APIs & Services → Credentials
 3. **Edit your OAuth 2.0 Client ID**
 4. **In "Authorized redirect URIs", add**:
    ```
@@ -25,6 +27,7 @@ From your console log, I can see your app is using: **`http://localhost:8081`**
 ### Step 2: Configure Your OAuth Client Correctly
 
 Make sure your Google OAuth Client is set up as:
+
 - **Application type**: Web application
 - **Authorized redirect URIs**: `http://localhost:8081`
 
@@ -47,7 +50,7 @@ Make sure your Google OAuth Client is set up as:
 
 1. Click "Continue with Google"
 2. Google OAuth popup opens
-3. Sign in with your Google account  
+3. Sign in with your Google account
 4. Popup closes automatically
 5. You're logged into the app with your profile showing
 
