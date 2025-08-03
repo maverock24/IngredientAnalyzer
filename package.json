@@ -8,7 +8,9 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "build": "expo export --platform web",
-    "build:web": "expo export --platform web"
+    "build:web": "expo export --platform web",
+    "dev:netlify": "netlify dev",
+    "functions:serve": "netlify functions:serve"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.2",
