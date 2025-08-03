@@ -164,74 +164,82 @@ export default function MainScreen({ onShowSetup }: MainScreenProps) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView}>
-        <View style={styles.header}>
-          <View style={styles.headerContent}>
-            <View style={styles.titleContainer}>
-              <Text style={styles.title}>Ingredient Analyzer</Text>
-              <Text style={styles.subtitle}>
-                Compare products for health and sustainability
-              </Text>
-            </View>
-            {onShowSetup && (
-              <TouchableOpacity style={styles.setupButton} onPress={onShowSetup}>
-                <Text style={styles.setupButtonText}>⚙️</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
-
-        <View style={styles.buttonRow}>
-          <TouchableOpacity style={styles.button} onPress={takePhoto} disabled={isAnalyzing}>
-            <Text style={styles.buttonText}>📷 Take Photo</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.button} onPress={addProduct} disabled={isAnalyzing}>
-            <Text style={styles.buttonText}>🖼️ Choose Image</Text>
-          </TouchableOpacity>
-        </View>
-
-        {isAnalyzing && (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#007AFF" />
-            <Text style={styles.loadingText}>Analyzing ingredients...</Text>
-          </View>
-        )}
-
-        {products.length > 0 && (
-          <View style={styles.productsContainer}>
-            <View style={styles.productsHeader}>
-              <Text style={styles.sectionTitle}>Products ({products.length})</Text>
-              <TouchableOpacity onPress={clearAll} style={styles.clearButton}>
-                <Text style={styles.clearButtonText}>Clear All</Text>
-              </TouchableOpacity>
-            </View>
-            
-            {products.map(product => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onRemove={() => removeProduct(product.id)}
-              />
-            ))}
-
-            {products.length >= 2 && (
-              <TouchableOpacity
-                style={styles.compareButton}
-                onPress={compareProducts}
-                disabled={isAnalyzing}
-              >
-                <Text style={styles.compareButtonText}>
-                  🔍 Compare Products
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+        <View style={[styles.contentContainer, { 
+          width: contentWidth, 
+          marginHorizontal: horizontalPadding,
+          paddingHorizontal: isTablet ? 0 : 20 
+        }]}>
+          <View style={styles.header}>
+            <View style={styles.headerContent}>
+              <View style={styles.titleContainer}>
+                <Text style={[styles.title, { fontSize: isTablet ? 32 : 28 }]}>
+                  Ingredient Analyzer
                 </Text>
-              </TouchableOpacity>
-            )}
+                <Text style={[styles.subtitle, { fontSize: isTablet ? 18 : 16 }]}>
+                  Compare products for health and sustainability
+                </Text>
+              </View>
+              {onShowSetup && (
+                <TouchableOpacity style={styles.setupButton} onPress={onShowSetup}>
+                  <Text style={styles.setupButtonText}>⚙️</Text>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
-        )}
 
-        {comparisonResult && (
-          <ComparisonResults result={comparisonResult} />
-        )}
+          <View style={styles.buttonRow}>
+            <TouchableOpacity style={styles.button} onPress={takePhoto} disabled={isAnalyzing}>
+              <Text style={styles.buttonText}>📷 Take Photo</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={styles.button} onPress={addProduct} disabled={isAnalyzing}>
+              <Text style={styles.buttonText}>🖼️ Choose Image</Text>
+            </TouchableOpacity>
+          </View>
+
+          {isAnalyzing && (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#007AFF" />
+              <Text style={styles.loadingText}>Analyzing ingredients...</Text>
+            </View>
+          )}
+
+          {products.length > 0 && (
+            <View style={styles.productsContainer}>
+              <View style={styles.productsHeader}>
+                <Text style={styles.sectionTitle}>Products ({products.length})</Text>
+                <TouchableOpacity onPress={clearAll} style={styles.clearButton}>
+                  <Text style={styles.clearButtonText}>Clear All</Text>
+                </TouchableOpacity>
+              </View>
+              
+              {products.map(product => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onRemove={() => removeProduct(product.id)}
+                />
+              ))}
+
+              {products.length >= 2 && (
+                <TouchableOpacity
+                  style={styles.compareButton}
+                  onPress={compareProducts}
+                  disabled={isAnalyzing}
+                >
+                  <Text style={styles.compareButtonText}>
+                    🔍 Compare Products
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
+
+          {comparisonResult && (
+            <ComparisonResults result={comparisonResult} />
+          )}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -245,10 +253,29 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
+  scrollContent: {
+    flexGrow: 1,
+    alignItems: 'center',
+  },
+  contentContainer: {
+    flex: 1,
+    maxWidth: 600, // Maximum width for optimal reading
+    width: '100%',
+  },
   header: {
     padding: 20,
     backgroundColor: '#fff',
     marginBottom: 10,
+    borderRadius: 12,
+    marginHorizontal: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   headerContent: {
     flexDirection: 'row',
@@ -285,16 +312,25 @@ const styles = StyleSheet.create({
   },
   buttonRow: {
     flexDirection: 'row',
-    paddingHorizontal: 20,
+    paddingHorizontal: 8,
     marginBottom: 20,
-    gap: 10,
+    gap: 12,
   },
   button: {
     flex: 1,
     backgroundColor: '#007AFF',
-    padding: 15,
-    borderRadius: 10,
+    padding: 16,
+    borderRadius: 12,
     alignItems: 'center',
+    minHeight: 50,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 3,
   },
   buttonText: {
     color: '#fff',
@@ -304,6 +340,7 @@ const styles = StyleSheet.create({
   loadingContainer: {
     alignItems: 'center',
     padding: 20,
+    marginHorizontal: 8,
   },
   loadingText: {
     marginTop: 10,
@@ -311,7 +348,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   productsContainer: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 8,
   },
   productsHeader: {
     flexDirection: 'row',
@@ -334,11 +371,21 @@ const styles = StyleSheet.create({
   },
   compareButton: {
     backgroundColor: '#34C759',
-    padding: 15,
-    borderRadius: 10,
+    padding: 16,
+    borderRadius: 12,
     alignItems: 'center',
     marginTop: 15,
     marginBottom: 20,
+    marginHorizontal: 8,
+    minHeight: 50,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 3,
   },
   compareButtonText: {
     color: '#fff',
