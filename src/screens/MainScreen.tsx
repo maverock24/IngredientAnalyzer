@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -30,6 +30,13 @@ export default function MainScreen({ onShowSetup }: MainScreenProps) {
   const [showProfile, setShowProfile] = useState(false);
 
   const { user } = useAuth();
+
+  // Close profile modal when user signs out
+  useEffect(() => {
+    if (!user && showProfile) {
+      setShowProfile(false);
+    }
+  }, [user, showProfile]);
 
   // Get screen dimensions for responsive design
   const { width: screenWidth, height: screenHeight } = Dimensions.get('window');

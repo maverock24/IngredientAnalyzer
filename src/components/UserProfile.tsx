@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -14,9 +15,10 @@ interface UserProfileProps {
 }
 
 export default function UserProfile({ onClose }: UserProfileProps) {
-  const { user, signOut } = useAuth();
+  const { user, signOut, isLoading } = useAuth();
 
   const handleSignOut = () => {
+    console.log('Sign out button clicked'); // Debug log
     Alert.alert(
       'Sign Out',
       'Are you sure you want to sign out?',
@@ -24,14 +26,30 @@ export default function UserProfile({ onClose }: UserProfileProps) {
         {
           text: 'Cancel',
           style: 'cancel',
+          onPress: () => console.log('Sign out cancelled'),
         },
         {
           text: 'Sign Out',
           style: 'destructive',
-          onPress: signOut,
+          onPress: () => {
+            console.log('Sign out confirmed'); // Debug log
+            performSignOut();
+          },
         },
       ]
     );
+  };
+
+  const performSignOut = async () => {
+    try {
+      console.log('Performing sign out...'); // Debug log
+      await signOut();
+      console.log('Sign out successful, closing modal'); // Debug log
+      onClose(); // Close the profile modal after successful sign out
+    } catch (error) {
+      console.error('Sign out failed:', error);
+      Alert.alert('Error', 'Failed to sign out. Please try again.');
+    }
   };
 
   if (!user) return null;
@@ -60,8 +78,25 @@ export default function UserProfile({ onClose }: UserProfileProps) {
         <Text style={styles.email}>{user.email}</Text>
 
         <View style={styles.actions}>
-          <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
-            <Text style={styles.signOutButtonText}>Sign Out</Text>
+          <TouchableOpacity 
+            style={[styles.signOutButton, isLoading && styles.signOutButtonDisabled]} 
+            onPress={handleSignOut}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator color="#fff" size="small" />
+            ) : (
+              <Text style={styles.signOutButtonText}>Sign Out</Text>
+            )}
+          </TouchableOpacity>
+
+          {/* Temporary direct sign out button for debugging */}
+          <TouchableOpacity 
+            style={[styles.directSignOutButton, isLoading && styles.signOutButtonDisabled]} 
+            onPress={performSignOut}
+            disabled={isLoading}
+          >
+            <Text style={styles.directSignOutButtonText}>Direct Sign Out (Debug)</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -149,6 +184,21 @@ const styles = StyleSheet.create({
     padding: 14,
     borderRadius: 8,
     alignItems: 'center',
+  },
+  signOutButtonDisabled: {
+    backgroundColor: '#FF3B30AA', // Semi-transparent when disabled
+  },
+  directSignOutButton: {
+    backgroundColor: '#007AFF',
+    padding: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  directSignOutButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
   },
   signOutButtonText: {
     color: '#fff',
