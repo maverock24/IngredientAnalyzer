@@ -3,7 +3,7 @@ import Constants from 'expo-constants';
 // Configuration for API keys and settings
 export const config = {
   // Get your Gemini API key from: https://aistudio.google.com/app/apikey
-  GEMINI_API_KEY: Constants.expoConfig?.extra?.GEMINI_API_KEY || 'your-gemini-api-key-here',
+  GEMINI_API_KEY: Constants.expoConfig?.extra?.GEMINI_API_KEY || process.env.GEMINI_API_KEY || '',
   
   // API endpoints
   GEMINI_API_URL: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent',
