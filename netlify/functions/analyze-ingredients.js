@@ -1,5 +1,44 @@
 const https = require('https');
 
+// Function to validate Google OAuth token
+async function validateGoogleToken(token) {
+  return new Promise((resolve, reject) => {
+    const options = {
+      hostname: 'oauth2.googleapis.com',
+      port: 443,
+      path: `/tokeninfo?access_token=${token}`,
+      method: 'GET'
+    };
+
+    const req = https.request(options, (res) => {
+      let data = '';
+      
+      res.on('data', (chunk) => {
+        data += chunk;
+      });
+      
+      res.on('end', () => {
+        try {
+          const tokenInfo = JSON.parse(data);
+          if (tokenInfo.error) {
+            reject(new Error(`Token validation failed: ${tokenInfo.error}`));
+          } else {
+            resolve(tokenInfo);
+          }
+        } catch (error) {
+          reject(new Error(`Failed to parse token info: ${error.message}`));
+        }
+      });
+    });
+
+    req.on('error', (error) => {
+      reject(new Error(`Token validation request failed: ${error.message}`));
+    });
+
+    req.end();
+  });
+}
+
 exports.handler = async (event, context) => {
   // Only allow POST requests
   if (event.httpMethod !== 'POST') {
@@ -7,7 +46,7 @@ exports.handler = async (event, context) => {
       statusCode: 405,
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
       },
       body: JSON.stringify({ error: 'Method not allowed' }),
@@ -20,7 +59,7 @@ exports.handler = async (event, context) => {
       statusCode: 200,
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
       },
       body: '',
@@ -28,6 +67,20 @@ exports.handler = async (event, context) => {
   }
 
   try {
+    // Validate authentication (optional - can be enabled for production)
+    const authHeader = event.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7);
+      try {
+        const tokenInfo = await validateGoogleToken(token);
+        console.log('Authenticated request from user:', tokenInfo.email);
+      } catch (error) {
+        console.warn('Token validation failed:', error.message);
+        // For now, we'll continue even if token validation fails
+        // In production, you might want to return an error here
+      }
+    }
+
     const { imageData, productName } = JSON.parse(event.body);
 
     if (!imageData) {
@@ -35,7 +88,7 @@ exports.handler = async (event, context) => {
         statusCode: 400,
         headers: {
           'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Headers': 'Content-Type',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         },
         body: JSON.stringify({ error: 'Image data is required' }),
       };
@@ -47,7 +100,7 @@ exports.handler = async (event, context) => {
         statusCode: 500,
         headers: {
           'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Headers': 'Content-Type',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         },
         body: JSON.stringify({ error: 'API key not configured' }),
       };
@@ -83,7 +136,7 @@ Please provide your response in a structured format with clear sections.`;
       statusCode: 200,
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(geminiResponse),
@@ -95,7 +148,7 @@ Please provide your response in a structured format with clear sections.`;
       statusCode: 500,
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
       },
       body: JSON.stringify({ 
         error: 'Internal server error',
