@@ -8,6 +8,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
+import { config } from '../config/environment';
 
 // Configure WebBrowser for better OAuth experience
 WebBrowser.maybeCompleteAuthSession();
@@ -51,19 +52,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Get client ID from environment variable or use placeholder for development
-  const clientId =
-    (process.env as any).EXPO_PUBLIC_GOOGLE_CLIENT_ID ||
-    (process.env as any).REACT_APP_GOOGLE_CLIENT_ID ||
-    (process.env as any).VITE_GOOGLE_CLIENT_ID ||
-    "your-google-client-id";
+  // Get client ID from configuration
+  const clientId = config.googleClientId;
 
-  console.log('Environment check:', {
-    EXPO_PUBLIC: (process.env as any).EXPO_PUBLIC_GOOGLE_CLIENT_ID,
-    REACT_APP: (process.env as any).REACT_APP_GOOGLE_CLIENT_ID,
-    VITE: (process.env as any).VITE_GOOGLE_CLIENT_ID,
-    final_clientId: clientId
-  });
+  // Log environment check for debugging
+  config.logEnvironment();
 
   // Check if client ID is properly configured
   const isClientIdConfigured = clientId !== "your-google-client-id";
