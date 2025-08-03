@@ -14,8 +14,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { Product, ComparisonResult } from '../types/Product';
 import { GeminiService } from '../services/GeminiService';
+import { useAuth } from '../contexts/AuthContext';
 import ProductCard from '../components/ProductCard';
 import ComparisonResults from '../components/ComparisonResults';
+import UserProfile from '../components/UserProfile';
 
 interface MainScreenProps {
   onShowSetup?: () => void;
@@ -25,6 +27,9 @@ export default function MainScreen({ onShowSetup }: MainScreenProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [comparisonResult, setComparisonResult] = useState<ComparisonResult | null>(null);
+  const [showProfile, setShowProfile] = useState(false);
+
+  const { user } = useAuth();
 
   // Get screen dimensions for responsive design
   const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
@@ -36,6 +41,11 @@ export default function MainScreen({ onShowSetup }: MainScreenProps) {
   const horizontalPadding = (screenWidth - contentWidth) / 2;
 
   const addProduct = async () => {
+    if (!user) {
+      Alert.alert('Authentication Required', 'Please sign in to analyze products.');
+      return;
+    }
+
     try {
       // Request permissions
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -88,6 +98,11 @@ export default function MainScreen({ onShowSetup }: MainScreenProps) {
   };
 
   const takePhoto = async () => {
+    if (!user) {
+      Alert.alert('Authentication Required', 'Please sign in to analyze products.');
+      return;
+    }
+
     try {
       const { status } = await ImagePicker.requestCameraPermissionsAsync();
       if (status !== 'granted') {
@@ -135,6 +150,11 @@ export default function MainScreen({ onShowSetup }: MainScreenProps) {
   };
 
   const compareProducts = async () => {
+    if (!user) {
+      Alert.alert('Authentication Required', 'Please sign in to compare products.');
+      return;
+    }
+
     if (products.length < 2) {
       Alert.alert('Not Enough Products', 'Please add at least 2 products to compare.');
       return;
@@ -180,13 +200,26 @@ export default function MainScreen({ onShowSetup }: MainScreenProps) {
                   Compare products for health and sustainability
                 </Text>
               </View>
-              {onShowSetup && (
-                <TouchableOpacity style={styles.setupButton} onPress={onShowSetup}>
-                  <Text style={styles.setupButtonText}>⚙️</Text>
-                </TouchableOpacity>
-              )}
+              <TouchableOpacity 
+                style={styles.userButton} 
+                onPress={() => setShowProfile(true)}
+              >
+                {user?.picture ? (
+                  <Image source={{ uri: user.picture }} style={styles.userAvatar} />
+                ) : (
+                  <View style={styles.userAvatarPlaceholder}>
+                    <Text style={styles.userAvatarText}>
+                      {user?.name?.charAt(0).toUpperCase() || '?'}
+                    </Text>
+                  </View>
+                )}
+              </TouchableOpacity>
             </View>
           </View>
+
+          {showProfile && (
+            <UserProfile onClose={() => setShowProfile(false)} />
+          )}
 
           <View style={styles.buttonRow}>
             <TouchableOpacity style={styles.button} onPress={takePhoto} disabled={isAnalyzing}>
@@ -298,6 +331,27 @@ const styles = StyleSheet.create({
   },
   setupButtonText: {
     fontSize: 18,
+  },
+  userButton: {
+    padding: 2,
+  },
+  userAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+  },
+  userAvatarPlaceholder: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#007AFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  userAvatarText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   title: {
     fontSize: 28,
