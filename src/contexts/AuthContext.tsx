@@ -54,7 +54,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Get client ID from environment variable or use placeholder for development
   const clientId =
     (process.env as any).EXPO_PUBLIC_GOOGLE_CLIENT_ID ||
+    (process.env as any).REACT_APP_GOOGLE_CLIENT_ID ||
+    (process.env as any).VITE_GOOGLE_CLIENT_ID ||
     "your-google-client-id";
+
+  console.log('Environment check:', {
+    EXPO_PUBLIC: (process.env as any).EXPO_PUBLIC_GOOGLE_CLIENT_ID,
+    REACT_APP: (process.env as any).REACT_APP_GOOGLE_CLIENT_ID,
+    VITE: (process.env as any).VITE_GOOGLE_CLIENT_ID,
+    final_clientId: clientId
+  });
 
   // Check if client ID is properly configured
   const isClientIdConfigured = clientId !== "your-google-client-id";

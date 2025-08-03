@@ -7,6 +7,7 @@
   NODE_VERSION = "18"
   NPM_VERSION = "9.8.1"
   # GEMINI_API_KEY should be set in Netlify dashboard under Site settings > Environment variables
+  # EXPO_PUBLIC_GOOGLE_CLIENT_ID is intentionally public (OAuth Client IDs are meant to be exposed)
 
 [functions]
   directory = "netlify/functions"

@@ -1,0 +1,5 @@
+# Netlify build ignore patterns
+# This file tells Netlify which files/patterns to ignore during builds
+
+# OAuth Client IDs are meant to be public, not secrets
+EXPO_PUBLIC_GOOGLE_CLIENT_ID
