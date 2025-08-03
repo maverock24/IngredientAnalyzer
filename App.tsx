@@ -5,7 +5,11 @@ import MainScreen from './src/screens/MainScreen';
 import SetupScreen from './src/components/SetupScreen';
 
 export default function App() {
-  const [showSetup, setShowSetup] = useState(true);
+  const [showSetup, setShowSetup] = useState(false); // Start with MainScreen
+
+  const handleShowSetup = () => {
+    setShowSetup(true);
+  };
 
   const handleContinue = () => {
     setShowSetup(false);
@@ -16,7 +20,7 @@ export default function App() {
       {showSetup ? (
         <SetupScreen onContinue={handleContinue} />
       ) : (
-        <MainScreen />
+        <MainScreen onShowSetup={handleShowSetup} />
       )}
       <StatusBar style="auto" />
     </SafeAreaProvider>

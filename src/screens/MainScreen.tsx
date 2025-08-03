@@ -8,6 +8,7 @@ import {
   Alert,
   Image,
   ActivityIndicator,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
@@ -16,10 +17,23 @@ import { GeminiService } from '../services/GeminiService';
 import ProductCard from '../components/ProductCard';
 import ComparisonResults from '../components/ComparisonResults';
 
-export default function MainScreen() {
+interface MainScreenProps {
+  onShowSetup?: () => void;
+}
+
+export default function MainScreen({ onShowSetup }: MainScreenProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [comparisonResult, setComparisonResult] = useState<ComparisonResult | null>(null);
+
+  // Get screen dimensions for responsive design
+  const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+  const isTablet = screenWidth >= 768;
+  const isLandscape = screenWidth > screenHeight;
+  
+  // Calculate optimal content width (max 600px for mobile portrait, centered on larger screens)
+  const contentWidth = Math.min(screenWidth, isTablet ? 600 : screenWidth);
+  const horizontalPadding = (screenWidth - contentWidth) / 2;
 
   const addProduct = async () => {
     try {
@@ -152,10 +166,19 @@ export default function MainScreen() {
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView}>
         <View style={styles.header}>
-          <Text style={styles.title}>Ingredient Analyzer</Text>
-          <Text style={styles.subtitle}>
-            Compare products for health and sustainability
-          </Text>
+          <View style={styles.headerContent}>
+            <View style={styles.titleContainer}>
+              <Text style={styles.title}>Ingredient Analyzer</Text>
+              <Text style={styles.subtitle}>
+                Compare products for health and sustainability
+              </Text>
+            </View>
+            {onShowSetup && (
+              <TouchableOpacity style={styles.setupButton} onPress={onShowSetup}>
+                <Text style={styles.setupButtonText}>⚙️</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
 
         <View style={styles.buttonRow}>
@@ -224,9 +247,30 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 20,
-    alignItems: 'center',
     backgroundColor: '#fff',
     marginBottom: 10,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  titleContainer: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  setupButton: {
+    padding: 8,
+    borderRadius: 20,
+    backgroundColor: '#f0f0f0',
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  setupButtonText: {
+    fontSize: 18,
   },
   title: {
     fontSize: 28,
