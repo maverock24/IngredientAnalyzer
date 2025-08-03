@@ -2,11 +2,12 @@
 export const config = {
   // For local development, you can set your API key here temporarily
   // Remember to remove it before committing!
-  GEMINI_API_KEY_LOCAL: '', // Add your key here for local testing
-  
+  GEMINI_API_KEY_LOCAL: "", // Add your key here for local testing
+
   // API endpoints
-  GEMINI_API_URL: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent',
-  
+  GEMINI_API_URL:
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent",
+
   // App settings
   MAX_PRODUCTS: 5,
   IMAGE_QUALITY: 0.8,

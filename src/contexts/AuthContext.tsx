@@ -1,8 +1,13 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import * as AuthSession from 'expo-auth-session';
-import * as WebBrowser from 'expo-web-browser';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as AuthSession from "expo-auth-session";
+import * as WebBrowser from "expo-web-browser";
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 // Configure WebBrowser for better OAuth experience
 WebBrowser.maybeCompleteAuthSession();
@@ -26,7 +31,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
@@ -37,9 +42,9 @@ interface AuthProviderProps {
 
 // Google OAuth configuration
 const discovery = {
-  authorizationEndpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
-  tokenEndpoint: 'https://www.googleapis.com/oauth2/v4/token',
-  revocationEndpoint: 'https://oauth2.googleapis.com/revoke',
+  authorizationEndpoint: "https://accounts.google.com/o/oauth2/v2/auth",
+  tokenEndpoint: "https://www.googleapis.com/oauth2/v4/token",
+  revocationEndpoint: "https://oauth2.googleapis.com/revoke",
 };
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
@@ -47,29 +52,31 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   // Get client ID from environment variable or use placeholder for development
-  const clientId = (process.env as any).EXPO_PUBLIC_GOOGLE_CLIENT_ID || 'your-google-client-id';
+  const clientId =
+    (process.env as any).EXPO_PUBLIC_GOOGLE_CLIENT_ID ||
+    "your-google-client-id";
 
   // Check if client ID is properly configured
-  const isClientIdConfigured = clientId !== 'your-google-client-id';
+  const isClientIdConfigured = clientId !== "your-google-client-id";
 
   // Use Expo's default redirect URI which handles COOP correctly
   const redirectUri = AuthSession.makeRedirectUri({
     preferLocalhost: true, // This helps with COOP issues
   });
 
-  console.log('Using redirect URI:', redirectUri); // Debug log
-  console.log('Client ID:', clientId); // Debug log
+  console.log("Using redirect URI:", redirectUri); // Debug log
+  console.log("Client ID:", clientId); // Debug log
 
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
       clientId,
-      scopes: ['openid', 'profile', 'email'],
+      scopes: ["openid", "profile", "email"],
       redirectUri,
       responseType: AuthSession.ResponseType.Token, // Use implicit flow to avoid client secret requirement
       usePKCE: false, // Explicitly disable PKCE for implicit flow
       extraParams: {
         // Ensure we're using the right flow
-        'prompt': 'select_account',
+        prompt: "select_account",
       },
     },
     discovery
@@ -82,33 +89,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Handle auth response
   useEffect(() => {
-    if (response?.type === 'success') {
+    if (response?.type === "success") {
       if (response.params.access_token) {
         // Direct access token from implicit flow
         fetchUserInfo(response.params.access_token);
       } else {
-        console.error('No access token in response:', response.params);
-        alert('Authentication failed: No access token received');
+        console.error("No access token in response:", response.params);
+        alert("Authentication failed: No access token received");
         setIsLoading(false);
       }
-    } else if (response?.type === 'error') {
-      console.error('Auth error:', response.error);
-      alert(`Authentication failed: ${response.error?.message || 'Unknown error'}`);
+    } else if (response?.type === "error") {
+      console.error("Auth error:", response.error);
+      alert(
+        `Authentication failed: ${response.error?.message || "Unknown error"}`
+      );
       setIsLoading(false);
-    } else if (response?.type === 'cancel') {
-      console.log('User cancelled authentication');
+    } else if (response?.type === "cancel") {
+      console.log("User cancelled authentication");
       setIsLoading(false);
     }
   }, [response]);
 
   const checkAuthState = async () => {
     try {
-      const storedUser = await AsyncStorage.getItem('user');
+      const storedUser = await AsyncStorage.getItem("user");
       if (storedUser) {
         setUser(JSON.parse(storedUser));
       }
     } catch (error) {
-      console.error('Error checking auth state:', error);
+      console.error("Error checking auth state:", error);
     } finally {
       setIsLoading(false);
     }
@@ -116,10 +125,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const fetchUserInfo = async (accessToken: string) => {
     try {
-      const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
-      
+      const response = await fetch(
+        "https://www.googleapis.com/oauth2/v2/userinfo",
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
+      );
+
       if (response.ok) {
         const userInfo = await response.json();
         const user: User = {
@@ -128,15 +140,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           email: userInfo.email,
           picture: userInfo.picture,
         };
-        
+
         setUser(user);
-        await AsyncStorage.setItem('user', JSON.stringify(user));
-        await AsyncStorage.setItem('accessToken', accessToken);
+        await AsyncStorage.setItem("user", JSON.stringify(user));
+        await AsyncStorage.setItem("accessToken", accessToken);
       } else {
-        throw new Error('Failed to fetch user info');
+        throw new Error("Failed to fetch user info");
       }
     } catch (error) {
-      console.error('Error fetching user info:', error);
+      console.error("Error fetching user info:", error);
     } finally {
       setIsLoading(false);
     }
@@ -145,48 +157,49 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const signIn = async () => {
     try {
       setIsLoading(true);
-      
+
       // Check if Google Client ID is configured
       if (!isClientIdConfigured) {
-        alert('Google OAuth is not configured. Please follow the setup instructions in GOOGLE_OAUTH_QUICK_SETUP.md');
+        alert(
+          "Google OAuth is not configured. Please follow the setup instructions in GOOGLE_OAUTH_QUICK_SETUP.md"
+        );
         setIsLoading(false);
         return;
       }
 
-      console.log('Starting OAuth flow with redirect URI:', redirectUri);
+      console.log("Starting OAuth flow with redirect URI:", redirectUri);
       const result = await promptAsync();
-      console.log('OAuth result:', result);
-      
+      console.log("OAuth result:", result);
+
       // The response will be handled by the useEffect above
     } catch (error) {
-      console.error('Sign in error:', error);
-      alert('Sign in failed. Please check your Google OAuth configuration.');
+      console.error("Sign in error:", error);
+      alert("Sign in failed. Please check your Google OAuth configuration.");
       setIsLoading(false);
     }
   };
 
   const signOut = async () => {
-    console.log('🔓 signOut function called'); // Debug log
+    console.log("🔓 signOut function called"); // Debug log
     try {
-      console.log('Starting sign out process...');
+      console.log("Starting sign out process...");
       setIsLoading(true);
-      
+
       // Clear user state first
-      console.log('Clearing user state...');
+      console.log("Clearing user state...");
       setUser(null);
-      
+
       // Clear stored data
-      console.log('Clearing AsyncStorage...');
-      await AsyncStorage.multiRemove(['user', 'accessToken']);
-      console.log('User data cleared successfully');
-      
+      console.log("Clearing AsyncStorage...");
+      await AsyncStorage.multiRemove(["user", "accessToken"]);
+      console.log("User data cleared successfully");
     } catch (error) {
-      console.error('Sign out error:', error);
+      console.error("Sign out error:", error);
       // Even if there's an error clearing storage, we should still sign out the user
       setUser(null);
     } finally {
       setIsLoading(false);
-      console.log('Sign out completed');
+      console.log("Sign out completed");
     }
   };
 

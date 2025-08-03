@@ -1,14 +1,14 @@
-import React from 'react';
+import React from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  Alert,
   ActivityIndicator,
-} from 'react-native';
-import { useAuth } from '../contexts/AuthContext';
+  Alert,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { useAuth } from "../contexts/AuthContext";
 
 interface UserProfileProps {
   onClose: () => void;
@@ -18,37 +18,33 @@ export default function UserProfile({ onClose }: UserProfileProps) {
   const { user, signOut, isLoading } = useAuth();
 
   const handleSignOut = () => {
-    console.log('Sign out button clicked'); // Debug log
-    Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-          onPress: () => console.log('Sign out cancelled'),
+    console.log("Sign out button clicked"); // Debug log
+    Alert.alert("Sign Out", "Are you sure you want to sign out?", [
+      {
+        text: "Cancel",
+        style: "cancel",
+        onPress: () => console.log("Sign out cancelled"),
+      },
+      {
+        text: "Sign Out",
+        style: "destructive",
+        onPress: () => {
+          console.log("Sign out confirmed"); // Debug log
+          performSignOut();
         },
-        {
-          text: 'Sign Out',
-          style: 'destructive',
-          onPress: () => {
-            console.log('Sign out confirmed'); // Debug log
-            performSignOut();
-          },
-        },
-      ]
-    );
+      },
+    ]);
   };
 
   const performSignOut = async () => {
     try {
-      console.log('Performing sign out...'); // Debug log
+      console.log("Performing sign out..."); // Debug log
       await signOut();
-      console.log('Sign out successful, closing modal'); // Debug log
+      console.log("Sign out successful, closing modal"); // Debug log
       onClose(); // Close the profile modal after successful sign out
     } catch (error) {
-      console.error('Sign out failed:', error);
-      Alert.alert('Error', 'Failed to sign out. Please try again.');
+      console.error("Sign out failed:", error);
+      Alert.alert("Error", "Failed to sign out. Please try again.");
     }
   };
 
@@ -78,8 +74,11 @@ export default function UserProfile({ onClose }: UserProfileProps) {
         <Text style={styles.email}>{user.email}</Text>
 
         <View style={styles.actions}>
-          <TouchableOpacity 
-            style={[styles.signOutButton, isLoading && styles.signOutButtonDisabled]} 
+          <TouchableOpacity
+            style={[
+              styles.signOutButton,
+              isLoading && styles.signOutButtonDisabled,
+            ]}
             onPress={handleSignOut}
             disabled={isLoading}
           >
@@ -91,12 +90,17 @@ export default function UserProfile({ onClose }: UserProfileProps) {
           </TouchableOpacity>
 
           {/* Temporary direct sign out button for debugging */}
-          <TouchableOpacity 
-            style={[styles.directSignOutButton, isLoading && styles.signOutButtonDisabled]} 
+          <TouchableOpacity
+            style={[
+              styles.directSignOutButton,
+              isLoading && styles.signOutButtonDisabled,
+            ]}
             onPress={performSignOut}
             disabled={isLoading}
           >
-            <Text style={styles.directSignOutButtonText}>Direct Sign Out (Debug)</Text>
+            <Text style={styles.directSignOutButtonText}>
+              Direct Sign Out (Debug)
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -106,44 +110,44 @@ export default function UserProfile({ onClose }: UserProfileProps) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 12,
     marginHorizontal: 8,
     marginVertical: 10,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: "#f0f0f0",
   },
   title: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
   },
   closeButton: {
     width: 30,
     height: 30,
     borderRadius: 15,
-    backgroundColor: '#f0f0f0',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#f0f0f0",
+    alignItems: "center",
+    justifyContent: "center",
   },
   closeButtonText: {
     fontSize: 16,
-    color: '#666',
+    color: "#666",
   },
   profileContent: {
     padding: 20,
-    alignItems: 'center',
+    alignItems: "center",
   },
   avatar: {
     width: 80,
@@ -155,54 +159,54 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#007AFF',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#007AFF",
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 16,
   },
   avatarText: {
     fontSize: 32,
-    color: '#fff',
-    fontWeight: 'bold',
+    color: "#fff",
+    fontWeight: "bold",
   },
   name: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
     marginBottom: 4,
   },
   email: {
     fontSize: 16,
-    color: '#666',
+    color: "#666",
     marginBottom: 24,
   },
   actions: {
-    width: '100%',
+    width: "100%",
   },
   signOutButton: {
-    backgroundColor: '#FF3B30',
+    backgroundColor: "#FF3B30",
     padding: 14,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
   },
   signOutButtonDisabled: {
-    backgroundColor: '#FF3B30AA', // Semi-transparent when disabled
+    backgroundColor: "#FF3B30AA", // Semi-transparent when disabled
   },
   directSignOutButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: "#007AFF",
     padding: 14,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 10,
   },
   directSignOutButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   signOutButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });
